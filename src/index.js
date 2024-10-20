@@ -158,7 +158,7 @@ async function main(){
         console.log("Soma das idades dos candidatos de QA: " + agesResult["QA"].totalAge);
 
         const transformedArray = Object.values(academyCandidates).flatMap(roleArray => 
-            roleArray.map(person => [person.name, person.age, person.role, person.state])
+            roleArray.map(person => [person.name, person.age + " anos", person.role, person.state])
             );
 
         createCSV('Sorted_Academy_Candidates.csv', transformedArray);
