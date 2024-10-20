@@ -1,17 +1,17 @@
-const fs = require('fs');
+const fs = require("fs");
 
 async function lerArquivoTexto(filePath) {
     return new Promise((resolve, reject) => {
-        fs.readFile(filePath, 'utf8', (error, data) => {
+        fs.readFile(filePath, "utf8", (error, data) => {
             if (error) {
-                reject('Erro ao ler o arquivo: ' + error);
+                reject("Erro ao ler o arquivo: " + error);
                 return;
             }
             
-            const lines = data.split('\n').map(line => line.trim()).filter(line => line.length > 0);         
+            const lines = data.split("\n").map(line => line.trim()).filter(line => line.length > 0);         
             
             const objects = lines.map(line => {
-                const [name, age, role, state] = line.split(';');                
+                const [name, age, role, state] = line.split(";");                
                 return {
                     name,
                     age: parseInt(age),
@@ -44,18 +44,18 @@ async function lerArquivoTexto(filePath) {
 
 function createCSV(path, data) {
     
-    const header = ['Nome', 'Idade', 'Vaga', 'Estado'];
+    const header = ["Nome", "Idade", "Vaga", "Estado"];
     const rows = data;
 
     rows.sort((a, b) => a[0].localeCompare(b[0]));
 
-    const csv = [header].concat(rows).map(row => row.join(';')).join('\n');
+    const csv = [header].concat(rows).map(row => row.join(";")).join("\n");
 
     fs.writeFile(path, csv, error => {
         if (error) {
-            console.error('Erro ao criar o arquivo CSV:', error);
+            console.error("Erro ao criar o arquivo CSV:", error);
         } else {
-            console.log('Arquivo CSV criado com sucesso:', path);
+            console.log("Arquivo CSV criado com sucesso:", path);
         }
     });
 };
@@ -161,14 +161,14 @@ async function main(){
             roleArray.map(person => [person.name, person.age + " anos", person.role, person.state])
             );
 
-        createCSV('Sorted_Academy_Candidates.csv', transformedArray);
+        createCSV("Sorted_Academy_Candidates.csv", transformedArray);
 
         const getInstrutorQA = () => {
             const fromQARole = academyCandidates["QA"];
             for(let i = 0; i < fromQARole.length; i++){
                 if(fromQARole[i].state === "SC"){
                     if(fromQARole[i].age = 25){                        
-                        if(isPalindrome(fromQARole[i].name.split(' ')[0])){
+                        if(isPalindrome(fromQARole[i].name.split(" ")[0])){
                             return fromQARole[i].name;
                         }
                     }
@@ -183,7 +183,7 @@ async function main(){
             for(let i = 0; i < fromMobileRole.length; i++){
                 if(fromMobileRole[i].state === "PI"){
                     if(fromMobileRole[i].age > 30 && fromMobileRole[i].age < 40 && fromMobileRole[i].age%2===0){                        
-                        if(fromMobileRole[i].name.split(' ')[1].split('')[0] === "C"){
+                        if(fromMobileRole[i].name.split(" ")[1].split("")[0] === "C"){
                             return fromMobileRole[i].name;
                         }
                     }
