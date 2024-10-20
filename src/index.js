@@ -1,6 +1,6 @@
 const fs = require("fs");
 
-async function lerArquivoTexto(filePath) {
+function lerArquivoTexto(filePath) {
     return new Promise((resolve, reject) => {
         fs.readFile(filePath, "utf8", (error, data) => {
             if (error) {
@@ -21,6 +21,10 @@ async function lerArquivoTexto(filePath) {
                 
             });
             
+            if(!objects[0]){
+              throw new Error("O objeto está vazio. Encerrando a aplicação.");
+            }
+
             if(objects[0].name === "Nome" && objects[0].role === "Vaga" && objects[0].state === "Estado" ){
                 objects.shift();
             }
@@ -40,7 +44,7 @@ async function lerArquivoTexto(filePath) {
             resolve(roleAgrouped);
         });
     });
-};
+}
 
 function createCSV(path, data) {
     
@@ -58,7 +62,7 @@ function createCSV(path, data) {
             console.log("Arquivo CSV criado com sucesso:", path);
         }
     });
-};
+}
 
 function getCandidatesTotal(candidates, roles){
     let total = 0;
@@ -66,20 +70,20 @@ function getCandidatesTotal(candidates, roles){
         total += candidates[roles[i]].length;
     }
     return total;
-};
+}
 
 function calculateCandidatePercentagePerRole(candidates, roles){
     const totalCandidates = getCandidatesTotal(candidates, roles);
-    rolePercentage = {};
+    rolePercentage = [];
     
     for(let i = 0; i < roles.length; i++){
         const role = roles[i];
         
-        rolePercentage[role] = parseFloat((candidates[roles[i]].length/totalCandidates*100).toFixed(2));               
+        rolePercentage[role] = (candidates[roles[i]].length/totalCandidates*100).toFixed(2)+"%";               
     }
 
     return rolePercentage;
-};
+}
 
 function findCandidateAges(candidates, roles){
     const result = {};
@@ -116,7 +120,7 @@ function findCandidateAges(candidates, roles){
     
     return result; 
     
-};
+}
 
 function isPalindrome(string){
     if(string.toLowerCase() === string.toLowerCase().split("").reverse().join("")){
@@ -142,32 +146,32 @@ function getDistinctStatesFromCandidates(candidates, roles){
 
 async function main(){
     try{
-        let academyCandidates = await lerArquivoTexto("./Academy_Candidates.txt");       
+        let academyCandidates = await lerArquivoTexto("./Academy_Candidates.txt");
+        
+        if (Object.keys(academyCandidates).length === 0) {
+          throw new Error("O objeto está vazio. Encerrando a aplicação.");
+        }
     
         let academyRoles = Object.keys(academyCandidates).map(role => role);
         
-        let rolePercentage = calculateCandidatePercentagePerRole(academyCandidates, academyRoles)
-        console.log("Os percentuais de candidatos por vaga são: ")
-        console.log(rolePercentage)
+        let rolePercentage = calculateCandidatePercentagePerRole(academyCandidates, academyRoles);
+        console.log("Os percentuais de candidatos por vaga são: ");
+        console.log(rolePercentage);        
 
         let agesResult = findCandidateAges(academyCandidates, academyRoles);
 
         console.log("Idade média dos candidatos de QA: " + agesResult["QA"].averageAge);
         console.log("Idade do candidato mais velho de Mobile: " + agesResult["Mobile"].maxAge);  
         console.log("Idade do candidato mais novo de Web: " + agesResult["Web"].minAge);
-        console.log("Soma das idades dos candidatos de QA: " + agesResult["QA"].totalAge);
+        console.log("Soma das idades dos candidatos de QA: " + agesResult["QA"].totalAge);       
 
-        const transformedArray = Object.values(academyCandidates).flatMap(roleArray => 
-            roleArray.map(person => [person.name, person.age + " anos", person.role, person.state])
-            );
-
-        createCSV("Sorted_Academy_Candidates.csv", transformedArray);
+        console.log("Número de estados distintos presentes entre os candidatos: " + getDistinctStatesFromCandidates(academyCandidates, academyRoles));        
 
         const getInstrutorQA = () => {
             const fromQARole = academyCandidates["QA"];
             for(let i = 0; i < fromQARole.length; i++){
                 if(fromQARole[i].state === "SC"){
-                    if(fromQARole[i].age = 25){                        
+                    if(fromQARole[i].age === 25){                        
                         if(isPalindrome(fromQARole[i].name.split(" ")[0])){
                             return fromQARole[i].name;
                         }
@@ -193,11 +197,15 @@ async function main(){
 
         console.log("Instrutor de Mobile descoberto: " + getInstrutorMobile());
 
-        console.log("Número de estados distintos presentes entre os candidatos: " + getDistinctStatesFromCandidates(academyCandidates, academyRoles));
+        const transformedArray = Object.values(academyCandidates).flatMap(roleArray => 
+          roleArray.map(person => [person.name, person.age + " anos", person.role, person.state])
+          );
+          
+        createCSV("Sorted_Academy_Candidates.csv", transformedArray);        
 
     } catch(error) {
         console.log(error)
     }
-};
+}
 
 main();
