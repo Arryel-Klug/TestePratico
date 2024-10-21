@@ -144,6 +144,18 @@ function getDistinctStatesFromCandidates(candidates, roles) {
     return distinctStates.size;
 }
 
+function calculateSquare(init, end) {
+    let result = [];
+
+    for (let i = init; i <= end; i++) {
+        const calc = Math.sqrt(i);
+        if (Number.isInteger(calc)) {
+            result.push(calc * calc)
+        }
+    }
+    return result;
+}
+
 async function main() {
     try {
         let academyCandidates = await readTextFile("./Academy_Candidates.txt");
@@ -171,7 +183,7 @@ async function main() {
             const fromQARole = academyCandidates["QA"];
             for (let i = 0; i < fromQARole.length; i++) {
                 if (fromQARole[i].state === "SC") {
-                    if (fromQARole[i].age === 25) {
+                    if (calculateSquare(20, 30).includes(fromQARole[i].age)) {
                         if (isPalindrome(fromQARole[i].name.split(" ")[0])) {
                             return fromQARole[i].name;
                         }
